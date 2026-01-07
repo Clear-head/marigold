@@ -60,6 +60,7 @@ services:
     volumes:
       - ../services/auth:/app/services/auth
       - ../libs:/app/libs
+      - ../logs:/app/logs
     depends_on:
       - mongodb
       - redis
@@ -75,6 +76,7 @@ services:
     volumes:
       - ../services/chat:/app/services/chat
       - ../libs:/app/libs
+      - ../logs:/app/logs
     depends_on:
       - mongodb
       - kafka
@@ -91,6 +93,7 @@ services:
     volumes:
       - ../services/ai:/app/services/ai
       - ../libs:/app/libs
+      - ../logs:/app/logs
     depends_on:
       - mongodb
       - chromadb
