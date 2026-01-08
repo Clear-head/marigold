@@ -18,7 +18,7 @@ RUN curl -sSL https://install.python-poetry.org | python3 - && \
 WORKDIR /app
 
 COPY libs/pyproject.toml libs/poetry.lock* /app/libs/
-COPY services/notification/pyproject.toml services/notification/poetry.lock* /app/
+COPY servers/chat/pyproject.toml servers/chat/poetry.lock* /app/
 
 RUN cd /app/libs && poetry install --no-root --only main && \
     cd /app && poetry install --no-root --only main --no-directory
@@ -45,16 +45,16 @@ COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/pytho
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 COPY --chown=marigold:marigold libs /app/libs
-COPY --chown=marigold:marigold services/notification /app/services/notification
+COPY --chown=marigold:marigold servers/chat /app/servers/chat
 
 USER marigold
 
-WORKDIR /app/services/notification
+WORKDIR /app/servers/chat
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:${SERVICE_PORT:-8000}/health || exit 1
 
 ENV SERVICE_PORT=8000
 
-ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0"]
+ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--ws", "websockets"]
 CMD ["--port", "8000"]

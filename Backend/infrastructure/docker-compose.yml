@@ -92,7 +92,7 @@ services:
   auth-service:
     build:
       context: ../
-      dockerfile: services/auth/Dockerfile
+      dockerfile: servers/auth/Dockerfile
     container_name: marigold-auth
     ports:
       - "${AUTH_EXTERNAL_PORT}:${AUTH_INTERNAL_PORT}"
@@ -100,7 +100,7 @@ services:
       - SERVICE_PORT=${AUTH_INTERNAL_PORT}
     env_file: .env
     volumes:
-      - ../services/auth:/app/services/auth
+      - ../servers/auth:/app/servers/auth
       - ../libs:/app/libs
       - ../logs:/app/logs
     depends_on:
@@ -116,7 +116,7 @@ services:
   chat-service:
     build:
       context: ../
-      dockerfile: services/chat/Dockerfile
+      dockerfile: servers/chat/Dockerfile
     container_name: marigold-chat
     ports:
       - "${CHAT_EXTERNAL_PORT}:${CHAT_INTERNAL_PORT}"
@@ -124,7 +124,7 @@ services:
       - SERVICE_PORT=${CHAT_INTERNAL_PORT}
     env_file: .env
     volumes:
-      - ../services/chat:/app/services/chat
+      - ../servers/chat:/app/servers/chat
       - ../libs:/app/libs
       - ../logs:/app/logs
     depends_on:
@@ -142,7 +142,7 @@ services:
   ai-service:
     build:
       context: ../
-      dockerfile: services/ai/Dockerfile
+      dockerfile: servers/ai/Dockerfile
     container_name: marigold-ai
     ports:
       - "${AI_EXTERNAL_PORT}:${AI_INTERNAL_PORT}"
@@ -150,7 +150,7 @@ services:
       - SERVICE_PORT=${AI_INTERNAL_PORT}
     env_file: .env
     volumes:
-      - ../services/ai:/app/services/ai
+      - ../servers/ai:/app/servers/ai
       - ../libs:/app/libs
       - ../logs:/app/logs
     depends_on:
@@ -170,7 +170,7 @@ services:
   calendar-service:
     build:
       context: ../
-      dockerfile: services/calendar/Dockerfile
+      dockerfile: servers/calendar/Dockerfile
     container_name: marigold-calendar
     ports:
       - "${CALENDAR_EXTERNAL_PORT}:${CALENDAR_INTERNAL_PORT}"
@@ -178,7 +178,7 @@ services:
       - SERVICE_PORT=${CALENDAR_INTERNAL_PORT}
     env_file: .env
     volumes:
-      - ../services/calendar:/app/services/calendar
+      - ../servers/calendar:/app/servers/calendar
       - ../libs:/app/libs
       - ../logs:/app/logs
     depends_on:
@@ -194,7 +194,7 @@ services:
   notification-service:
     build:
       context: ../
-      dockerfile: services/notification/Dockerfile
+      dockerfile: servers/notification/Dockerfile
     container_name: marigold-notification
     ports:
       - "${NOTIFICATION_EXTERNAL_PORT}:${NOTIFICATION_INTERNAL_PORT}"
@@ -202,7 +202,7 @@ services:
       - SERVICE_PORT=${NOTIFICATION_INTERNAL_PORT}
     env_file: .env
     volumes:
-      - ../services/notification:/app/services/notification
+      - ../servers/notification:/app/servers/notification
       - ../libs:/app/libs
       - ../logs:/app/logs
     depends_on:
