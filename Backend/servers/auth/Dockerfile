@@ -18,7 +18,7 @@ RUN curl -sSL https://install.python-poetry.org | python3 - && \
 WORKDIR /app
 
 COPY libs/pyproject.toml libs/poetry.lock* /app/libs/
-COPY services/auth/pyproject.toml services/auth/poetry.lock* /app/
+COPY servers/auth/pyproject.toml servers/auth/poetry.lock* /app/
 
 RUN cd /app/libs && poetry install --no-root --only main && \
     cd /app && poetry install --no-root --only main --no-directory
@@ -45,11 +45,11 @@ COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/pytho
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 COPY --chown=marigold:marigold libs /app/libs
-COPY --chown=marigold:marigold services/auth /app/services/auth
+COPY --chown=marigold:marigold servers/auth /app/servers/auth
 
 USER marigold
 
-WORKDIR /app/services/auth
+WORKDIR /app/servers/auth
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:${SERVICE_PORT:-8000}/health || exit 1

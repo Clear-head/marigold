@@ -10,6 +10,8 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         curl \
         build-essential \
+        gcc \
+        g++ \
         && rm -rf /var/lib/apt/lists/*
 
 RUN curl -sSL https://install.python-poetry.org | python3 - && \
@@ -18,8 +20,9 @@ RUN curl -sSL https://install.python-poetry.org | python3 - && \
 WORKDIR /app
 
 COPY libs/pyproject.toml libs/poetry.lock* /app/libs/
-COPY services/chat/pyproject.toml services/chat/poetry.lock* /app/
+COPY servers/ai/pyproject.toml servers/ai/poetry.lock* /app/
 
+# AI 라이브러리는 빌드 시간이 오래 걸리므로 타임아웃 증가
 RUN cd /app/libs && poetry install --no-root --only main && \
     cd /app && poetry install --no-root --only main --no-directory
 
@@ -28,15 +31,19 @@ FROM python:3.11-slim AS runtime
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PATH="/root/.local/bin:$PATH"
+    PATH="/root/.local/bin:$PATH" \
+    # LangChain 최적화
+    LANGCHAIN_TRACING_V2=false \
+    TOKENIZERS_PARALLELISM=false
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         curl \
+        libgomp1 \
         && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m -u 1000 marigold && \
-    mkdir -p /app/logs && \
+    mkdir -p /app/logs /app/cache && \
     chown -R marigold:marigold /app
 
 WORKDIR /app
@@ -45,16 +52,17 @@ COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/pytho
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 COPY --chown=marigold:marigold libs /app/libs
-COPY --chown=marigold:marigold services/chat /app/services/chat
+COPY --chown=marigold:marigold servers/ai /app/servers/ai
 
 USER marigold
 
-WORKDIR /app/services/chat
+WORKDIR /app/servers/ai
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:${SERVICE_PORT:-8000}/health || exit 1
 
 ENV SERVICE_PORT=8000
 
-ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--ws", "websockets"]
+# AI 서비스는 더 많은 워커와 타임아웃 필요
+ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--timeout-keep-alive", "75"]
 CMD ["--port", "8000"]
