@@ -6,11 +6,9 @@ from beanie import Document, Field
 
 class User(Document):
     id: str
-    password: str
     name: str
     phone: str
     birth: datetime
-
     created_at: datetime = Field(default_factory=datetime.now)
 
 
