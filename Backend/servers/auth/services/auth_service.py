@@ -44,7 +44,22 @@ class IssueJWTService:
 
         refresh_token = jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
         return refresh_token
+        
+    async def issue_tokens(self, user_id: str) -> dict:
+        try:
+            access_token = await self._create_access_token(user_id)
+            refresh_token = await self._create_refresh_token(user_id)
 
+            await self.token_repository.create_redis_item(f"access_token_{user_id}", access_token)
+            await self.token_repository.create_redis_item(f"refresh_token_{user_id}", refresh_token)
+            return {
+                f"access_token_{user_id}": access_token,
+                f"refresh_token_{user_id}": refresh_token
+            }
+        except Exception as e:
+            self.logger.error(f"Unexpected error during issue tokens: {e}")
+            raise e(f"Issue tokens failed: {str(e)}")
+    
     async def refresh_token(self, user_id: str, refresh_token: str) -> str:
         try:
             if not await self.validator.verify_jwt_http(refresh_token):
@@ -54,11 +69,12 @@ class IssueJWTService:
             access_token = await self._create_access_token(user_id)
             refresh_token = await self._create_refresh_token(user_id)
             
-            await self.token_repository.update_redis_item(f"refresh_token:{refresh_token}", user_id)
+            await self.token_repository.update_redis_item(f"access_token_{user_id}", access_token)
+            await self.token_repository.update_redis_item(f"refresh_token_{user_id}", refresh_token)
 
             return {
-                "access_token": access_token,
-                "refresh_token": refresh_token
+                f"access_token_{user_id}": access_token,
+                f"refresh_token_{user_id}": refresh_token
             }
 
         except TokenExpiredException:
@@ -69,6 +85,16 @@ class IssueJWTService:
             self.logger.error(f"Unexpected error during refresh token: {e}")
             raise e(f"Refresh token verification failed: {str(e)}")
         
-        
-        
 
+    async def delete_tokens(self, user_id: str) -> bool:
+        try:
+            await self.token_repository.delete_redis_item(f"access_token_{user_id}")
+            await self.token_repository.delete_redis_item(f"refresh_token_{user_id}")
+            
+            self.logger.info(f"Deleted tokens for user: {user_id}")
+
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Failed to delete tokens for user {user_id}: {e}")
+            raise e
