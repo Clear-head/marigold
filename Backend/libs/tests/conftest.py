@@ -22,6 +22,12 @@ def setup_test_environment():
     # 환경변수 설정 (로거가 사용)
     os.environ["LOG_DIR"] = str(test_log_dir)
 
+    # Kafka 로컬 테스트를 위한 환경변수 설정
+    # Docker 내부: kafka:9092
+    # 로컬 테스트: localhost:9092
+    if "KAFKA_BOOTSTRAP_SERVERS" not in os.environ:
+        os.environ["KAFKA_BOOTSTRAP_SERVERS"] = "localhost:9092"
+
     yield
 
     # 테스트 후 정리 (선택사항)
@@ -47,6 +53,7 @@ def mock_settings():
     settings.REDIS_URL = "redis://:test_password@localhost:6379/0"
     settings.MONGO_URL = "mongodb://test_user:test_pass@localhost:27017"
     settings.MONGO_DB_NAME = "test_database"
+    settings.KAFKA_BOOTSTRAP_SERVERS = "localhost:9092"
 
     return settings
 
@@ -63,12 +70,25 @@ def reset_singletons():
     except ImportError:
         pass
 
+    # Kafka Producer 초기화
+    try:
+        import kafka.producer as kafka_prod
+        kafka_prod.kafka_producer._client = None
+    except ImportError:
+        pass
+
     yield
 
     # 테스트 후 정리
     try:
         import databases.redis_client as redis_client
         redis_client._redis_client = None
+    except ImportError:
+        pass
+
+    try:
+        import kafka.producer as kafka_prod
+        kafka_prod.kafka_producer._client = None
     except ImportError:
         pass
 
