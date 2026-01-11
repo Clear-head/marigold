@@ -7,7 +7,6 @@ from beanie import Document, Field
 class UserCredential(Document):
     id: str
     password_hased: str
-    name: str
 
     class Settings:
         name = "user_credentials"
