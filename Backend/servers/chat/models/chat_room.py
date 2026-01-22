@@ -9,3 +9,4 @@ class ChatRoom(Document):
 
     class Settings:
         name = "chat_room"
+        indexes = [("id", "members")]
