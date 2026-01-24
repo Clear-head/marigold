@@ -4,7 +4,6 @@ from datetime import datetime
 
 class RequestChangeBirth(BaseModel):
     birth: datetime
-    password: str
 
 class ResponseChangeBirth(JSONResponse):
     status_code: int
