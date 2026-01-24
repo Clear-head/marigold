@@ -3,9 +3,9 @@
 from repositories.user_repository import UserRepository
 from libs.commons.logger import get_marigold_logger
 
-from Backend.servers.user.schemas.change_name_dto import RequestChangeName, ResponseChangeName
-from Backend.servers.user.schemas.change_phone_dto import RequestChangePhone, ResponseChangePhone
-from Backend.servers.user.schemas.change_birth_dto import RequestChangeBirth, ResponseChangeBirth
+from dto.change_name_dto import RequestChangeName, ResponseChangeName
+from dto.change_phone_dto import RequestChangePhone, ResponseChangePhone
+from dto.change_birth_dto import RequestChangeBirth, ResponseChangeBirth
 
 class UserService:
     # TODO 
