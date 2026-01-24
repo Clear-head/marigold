@@ -9,6 +9,7 @@ from services.hasher import verify_password
 logger = get_marigold_logger(__name__)
 
 # 우선 리턴은 bool값으로 받지만 추후 수정 가능
+# TODO: 파일명 auth_service.py 변경 및 클래스화, 비밀번호 변경 로직 추가가
 async def login(user_id: str, password: str) -> bool:
     try:
         credential_repository = CredentialRepository()
