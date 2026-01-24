@@ -14,7 +14,7 @@ class CredentialRepository:
         self.document = UserCredential
 
     async def create_credential(self, credential: UserCredential) -> UserCredential:
-        return await self.document.insert_one(credential)
+        return await self.document.create(credential)
     
     async def update_credential(self, credential_id: str, credential: UserCredential) -> UserCredential:
         return await self.document.update_one(self.document.id == credential_id, credential)
@@ -24,9 +24,6 @@ class CredentialRepository:
     
     async def get_all_credentials(self) -> List[UserCredential]:
         return await self.document.find_all().to_list()
-    
-    async def get_credential_by_name(self, name: str) -> UserCredential:
-        return await self.document.find_one(self.document.name == name)
     
     async def get_credential_by_id(self, id: str) -> UserCredential:
         return await self.document.find_one(self.document.id == id)
