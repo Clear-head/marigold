@@ -1,6 +1,8 @@
 # Backend\servers\auth\api\auth_router.py
 # fastapi
 
+# 비밀번호만 인증하는 라우터가 필요함
+
 from fastapi import APIRouter, status, Header, Depends, HTTPException
 from dto.dto import LoginRequest, TokenResponse, SignupRequest, LoginResponse
 from typing import Annotated
