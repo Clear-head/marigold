@@ -12,7 +12,7 @@ class SendTextMessage(BaseModel):
     room_id: int
     sender_id: str
     content: str
-    send_at: str = datetime.now()
+    send_at: datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     type: str = "text"
 
 
