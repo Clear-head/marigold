@@ -27,10 +27,10 @@ class KafkaProducer:
             self._client = None
             raise e
 
-    async def send_message(self, message: dict, topic: str, key: str):
+    async def publish_message(self, message: dict, topic: str, key: str | None = None):
         try:
 
-            await self._client.send_and_wait(topic=topic, value=message, key=key)
+            await self._client.send_and_wait(topic=topic, value=message, key=key.encode("utf-8"))
             return True
 
         except Exception as e:
