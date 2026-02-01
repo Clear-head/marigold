@@ -23,8 +23,9 @@ dependencies = ["pyjwt (>=2.10.1,<3.0.0)",
 packages = [
     { include = "commons" },
     { include = "databases" },
-    { include = "dto" },
-    { include = "exceptions" }
+    { include = "common_dto" },
+    { include = "exceptions" },
+    { include = "kafka" }
 ]
 
 

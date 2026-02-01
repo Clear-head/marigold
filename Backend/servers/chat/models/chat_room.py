@@ -1,11 +1,11 @@
 from typing import List
 
-from beanie import Document, PydanticObjectId
+from beanie import Document
 
 
 class ChatRoom(Document):
-    id: str
-    members: List[PydanticObjectId]
+    id: int
+    members: List[str]
 
     class Settings:
         name = "chat_room"
