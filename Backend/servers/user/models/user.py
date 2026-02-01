@@ -1,8 +1,7 @@
-# Backend\servers\user\models\user_document.py
-# beanie
+# Backend\servers\user\models\user.py
 
-from datetime import datetime
 from beanie import Document, Field
+from datetime import datetime
 
 class User(Document):
     id: str
@@ -11,7 +10,6 @@ class User(Document):
     birth: datetime
     created_at: datetime = Field(default_factory=datetime.now)
 
-
     class Settings:
         name = "users"
-
+        indexes = [("id")]
