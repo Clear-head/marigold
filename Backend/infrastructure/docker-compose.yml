@@ -217,6 +217,30 @@ services:
     restart: unless-stopped
     command: ["--port", "${NOTIFICATION_INTERNAL_PORT}"]
 
+  user-service:
+    build:
+      context: ../
+      dockerfile: servers/user/Dockerfile
+    container_name: marigold-user
+    ports:
+      - "${USER_EXTERNAL_PORT}:${USER_INTERNAL_PORT}"
+    environment:
+      - SERVICE_PORT=${USER_INTERNAL_PORT}
+    env_file: .env
+    volumes:
+      - ../servers/user:/app/servers/user
+      - ../libs:/app/libs
+      - ../logs:/app/logs
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - marigold-backend
+    restart: unless-stopped
+    command: ["--port", "${USER_INTERNAL_PORT}"]
+
 networks:
   marigold-backend:
     driver: bridge

@@ -28,7 +28,8 @@ FROM python:3.11-slim AS runtime
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PATH="/root/.local/bin:$PATH"
+    PATH="/root/.local/bin:$PATH" \
+    PYTHONPATH="/app/libs:/app/servers/chat"
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
