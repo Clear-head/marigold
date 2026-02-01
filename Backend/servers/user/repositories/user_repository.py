@@ -3,7 +3,7 @@
 # logger, client, document
 
 from libs.commons.logger import get_marigold_logger
-from models.user_document import User
+from models.user import User
 from libs.databases.mongo_client import get_mongo_client
 from typing import List
 
