@@ -2,16 +2,15 @@ from pydantic import BaseModel
 
 
 class InviteChatRoomDto(BaseModel):
-    room_id: int
+    room_id: str
     target_user_id: str
     sender_id: str
 
 
 class ExiteChatRoomDto(BaseModel):
-    room_id: int
+    room_id: str
     exit_user_id: str
 
 
 class CreateChatRoomDto(BaseModel):
-    room_id: int
     creator_id: str

@@ -23,7 +23,7 @@ class MediaMeta(BaseModel):
 
 class MessageDTO(BaseModel):
     message_type: MessageTypeEnum
-    room_id: str
+    room_id: str  # MongoDB ObjectId as string
     sender_id: str
     send_at: datetime
     content: str | None = None      # TEXT 전용

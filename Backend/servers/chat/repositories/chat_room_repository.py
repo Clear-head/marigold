@@ -1,6 +1,7 @@
 from typing import List
 
-from Backend.servers.chat.models.chat_room import ChatRoom
+from beanie import PydanticObjectId
+from models.chat_room import ChatRoom
 from commons.logger import get_marigold_logger
 
 
@@ -23,18 +24,27 @@ class ChatRoomRepository:
             self.logger.error(f"Failed to fetch rooms for user {user_id}: {e}")
             raise e
 
-    async def remove_room(self, room_id: int):
+    async def get_room_by_id(self, room_id: str) -> ChatRoom | None:
         try:
-            room = await self.model.get(room_id)
+            oid = PydanticObjectId(room_id)
+            return await self.model.get(oid)
+        except Exception as e:
+            self.logger.error(f"Failed to fetch room {room_id}: {e}")
+            raise e
+
+    async def remove_room(self, room_id: str):
+        try:
+            oid = PydanticObjectId(room_id)
+            room = await self.model.get(oid)
             if room:
                 await room.delete()
         except Exception as e:
             self.logger.error(f"Failed to remove room {room_id}: {e}")
             raise e
 
-    async def update_room(self, room_id: int, target_room: ChatRoom):
+    async def update_room(self, room_id: str, target_room: ChatRoom):
         try:
-            await self.model.update_one(self.model.room_id == room_id, target_room)
+            await target_room.save()
         except Exception as e:
             self.logger.error(f"Failed to update room {room_id}: {e}")
             raise e

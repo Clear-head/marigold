@@ -1,5 +1,6 @@
 from typing import List
 
+from beanie import PydanticObjectId
 from Backend.servers.chat.models.messages import BaseMessage
 from commons.logger import get_marigold_logger
 
@@ -16,10 +17,11 @@ class MessageRepository:
             self.logger.error(f"Failed to insert message: {e}")
             raise e
 
-    async def get_messages_by_room_id(self, room_id: int, limit: int = 50) -> List[BaseMessage]:
+    async def get_messages_by_room_id(self, room_id: str, limit: int = 50) -> List[BaseMessage]:
         try:
+            oid = PydanticObjectId(room_id)
             return await self.model.find(
-                self.model.room_id == room_id
+                self.model.room_id == oid
             ).sort("-send_at").limit(limit).to_list()
         except Exception as e:
             self.logger.error(f"Failed to read messages for room {room_id}: {e}")
@@ -39,9 +41,10 @@ class MessageRepository:
             self.logger.error(f"Failed to delete message {message.id}: {e}")
             raise e
 
-    async def delete_all_messages_in_room(self, room_id: int):
+    async def delete_all_messages_in_room(self, room_id: str):
         try:
-            await self.model.find(self.model.room_id == room_id).delete()
+            oid = PydanticObjectId(room_id)
+            await self.model.find(self.model.room_id == oid).delete()
         except Exception as e:
             self.logger.error(f"Failed to delete all messages in room {room_id}: {e}")
             raise e

@@ -29,6 +29,8 @@ class KafkaProducer:
 
     async def publish_message(self, message: dict, topic: str, key: str | None = None):
         try:
+            if key is None:
+                raise Exception("Key must be provided")
 
             await self._client.send_and_wait(topic=topic, value=message, key=key.encode("utf-8"))
             return True

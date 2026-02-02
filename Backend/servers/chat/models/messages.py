@@ -1,11 +1,10 @@
 from datetime import datetime
 
-from beanie import Document
+from beanie import Document, PydanticObjectId
 from pydantic import BaseModel
 
 
 class MediaMeta(BaseModel):
-    """Embedded document for media metadata"""
     file_url: str
     file_name: str
     file_size: int  # bytes
@@ -17,12 +16,13 @@ class MediaMeta(BaseModel):
 
 
 class BaseMessage(Document):
-    room_id: int
+    room_id: PydanticObjectId
     sender_id: str
     send_at: datetime
 
     class Settings:
         is_root = True
+        indexes = [("room_id", "send_at")]
 
 
 class TextMessage(BaseMessage):
