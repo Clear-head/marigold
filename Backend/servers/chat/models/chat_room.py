@@ -1,10 +1,10 @@
-from typing import List
+from typing import List, Optional
 
 from beanie import Document, PydanticObjectId
 
 
 class ChatRoom(Document):
-    id: PydanticObjectId
+    id: Optional[PydanticObjectId] = None
     members: List[str]
 
     class Settings:
