@@ -1,4 +1,8 @@
+from typing import List
+
 from pydantic import BaseModel
+
+from models.chat_room import ChatRoom
 
 
 class InviteChatRoomDto(BaseModel):
@@ -13,4 +17,8 @@ class ExiteChatRoomDto(BaseModel):
 
 
 class CreateChatRoomDto(BaseModel):
-    creator_id: str
+    members: List[str]  #   user id
+
+
+class ResponseGetChatRoomDto(BaseModel):
+    rooms: List[ChatRoom]

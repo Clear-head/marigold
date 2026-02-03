@@ -1,6 +1,5 @@
 from datetime import datetime
 from enum import Enum
-
 from pydantic import BaseModel
 
 
@@ -25,8 +24,6 @@ class MediaMeta(BaseModel):
 class MessageRequest(BaseModel):
     """
     WebSocket으로 받는 메시지 요청 (클라이언트 → 서버)
-
-    sender_id와 send_at은 서버에서 자동 생성되므로 포함하지 않음
     """
     message_type: MessageTypeEnum
     room_id: str
@@ -36,9 +33,18 @@ class MessageRequest(BaseModel):
 
 # 서버 응답 및 DB 저장용 DTO
 class MessageDTO(BaseModel):
+    _id: str = None
     message_type: MessageTypeEnum
-    room_id: str  # MongoDB ObjectId as string
     sender_id: str
-    send_at: datetime
+    send_at: datetime = datetime.now()
     content: str | None = None      # TEXT 전용
     media: MediaMeta | None = None  # IMAGE, VIDEO 전용
+
+
+class RequestMessageDTO(BaseModel):
+    room_id: str
+    last_message_id: str
+
+
+class ResponseMessagesDTO(BaseModel):
+    messages: list[MessageDTO]

@@ -1,7 +1,8 @@
 from datetime import datetime
+from typing import Optional
 
 from beanie import Document, PydanticObjectId
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class MediaMeta(BaseModel):
@@ -16,6 +17,7 @@ class MediaMeta(BaseModel):
 
 
 class BaseMessage(Document):
+    _id: Optional[PydanticObjectId] = None
     room_id: PydanticObjectId
     sender_id: str
     send_at: datetime

@@ -23,4 +23,4 @@ class KafkaTopic(str, Enum):
     NOTIFICATION_PUSH = "marigold.notification.push"
 
     # Calendar Service
-    CALENDAR_EVENT = "marigold.calendar.event"
+    CALENDAR_EVENT = "marigold.calendar.calender"

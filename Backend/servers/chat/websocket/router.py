@@ -11,7 +11,6 @@ from websocket.handler import WebSocketHandler
 logger = get_marigold_logger(__name__)
 websocket_router = APIRouter()
 
-# 싱글톤 인스턴스
 connection_manager = WSConnectionManager()
 chat_service = ChatService()
 room_service = RoomService()
