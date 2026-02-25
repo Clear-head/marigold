@@ -24,3 +24,6 @@ class KafkaTopic(str, Enum):
 
     # Calendar Service
     CALENDAR_EVENT = "marigold.calendar.calender"
+
+    # AI Service
+    AI_REQUEST = "marigold.ai.request"

@@ -1,63 +1,68 @@
-from datetime import datetime, timedelta
+from datetime import datetime
+from typing import Literal
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel
 
-"""
 
-    Chat Service
-
-"""
-class SendTextMessage(BaseModel):
-    """단순 텍스트 채팅"""
-    room_id: int
+class NotificationToOfflineUsers(BaseModel):
+    """
+    오프라인 유저 알림
+    chat -> notification
+    topic: NOTIFICATION_PUSH
+    """
+    user_ids: list[str]
+    room_id: str
     sender_id: str
-    content: str
-    send_at: datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    type: str = "text"
+    message_type: str       # text, image, video
+    message_preview: str    # 알림에 표시할 미리보기 텍스트
+    sent_at: datetime
 
 
-class RequestCreateChatRoom(BaseModel):
-    creator_id: str
-
-
-class InvitedRoom(BaseModel):
-    creator_id: str
-    room_id: int
-    invited_user_id: str
-    invited_at: datetime
-
-
-
-"""
-
-    User Service
-
-"""
-class Register(BaseModel):
-    id: str
-    password: str
+class SignupRequest(BaseModel):
+    """
+    회원가입
+    auth -> user
+    topic: USER_AUTH
+    """
+    type: Literal["SIGNUP"] = "SIGNUP"
+    user_id: str
     name: str
     phone: str
-    created_at: datetime = datetime.now()
-    birth: datetime
-
-    @field_validator("created_at")
-    def validate_created_at(cls, value):
-        if value < (datetime.now() - timedelta(minutes=15)):
-            raise Exception("time error")
-        return value
+    birth: str
+    created_at: datetime
 
 
-class Login(BaseModel):
-    id: str
-    password: str
-
-
-"""
-
-    Notification Service
-
-"""
-class UserStatus(BaseModel):
+class WithdrawRequest(BaseModel):
+    """
+    회원 탈퇴
+    auth -> user, room & chat
+    topic: USER_PROFILE
+    """
+    type: Literal["DELETE_USER"] = "DELETE_USER"
     user_id: str
-    is_active: bool
+    withdrawn_at: datetime
+
+
+class AIRequest(BaseModel):
+    """
+    ai 서비스 이용
+    chat -> ai
+    topic: AI_REQUEST
+    """
+    room_id: str
+    user_id: str
+    prompt: str
+    requested_at: datetime
+
+
+class CalendarNotification(BaseModel):
+    """
+    캘린더 일정 알림
+    calendar -> notification
+    topic: CALENDAR_EVENT
+    """
+    user_id: str
+    event_id: str
+    title: str
+    scheduled_at: datetime
+    notify_at: datetime
