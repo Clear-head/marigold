@@ -16,7 +16,7 @@ class JWTValidator:
     def __init__(self):
         self.logger = get_marigold_logger(__name__)
 
-    async def _validate_jwt(self, token: str) -> dict:
+    async def _validate_jwt(self, token: str, check_session: bool = True) -> dict:
         try:
             # JWT 디코딩 및 기본 검증
             payload = jwt.decode(
