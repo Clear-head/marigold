@@ -2,8 +2,6 @@ from datetime import datetime
 from enum import Enum
 from pydantic import BaseModel
 
-from models.messages import BaseMessage
-
 
 class MessageTypeEnum(str, Enum):
     TEXT = "text"
@@ -51,7 +49,3 @@ class ResponseMessagesDTO(BaseModel):
     messages: list[MessageDTO]
 
 
-class RequestMessageToFCMDTO(BaseModel):
-    messages: BaseMessage
-    user_ids: list[str]
-    room_id: str

@@ -2,11 +2,11 @@ from datetime import datetime
 
 from commons.logger import get_marigold_logger
 
-from dto.message_dto import RequestMessageToFCMDTO
 from exceptions.message_exceptions import MessageSendFailedException
+from kafka.events_schema import NotificationToOfflineUsers
 from kafka.producer import kafka_producer
 from kafka.topics import KafkaTopic
-from models.messages import BaseMessage
+from models.messages import BaseMessage, TextMessage, ImageMessage, VideoMessage
 from repositories.message_repository import MessageRepository
 
 
@@ -46,18 +46,27 @@ class ChatService:
 
     async def send_message_to_offline(self, user_id: list[str], message: BaseMessage, room_id: str):
         try:
+            if isinstance(message, TextMessage):
+                msg_type, msg_preview = "text", message.content
+            elif isinstance(message, ImageMessage):
+                msg_type, msg_preview = "image", "[이미지]"
+            else:
+                msg_type, msg_preview = "video", "[동영상]"
 
-            fcm_request = RequestMessageToFCMDTO(
+            event = NotificationToOfflineUsers(
                 user_ids=user_id,
-                messages=message,
-                room_id=room_id
+                room_id=room_id,
+                sender_id=message.sender_id,
+                message_type=msg_type,
+                message_preview=msg_preview,
+                sent_at=message.send_at,
             )
 
             #   notification 으로 발행
             publish_success = await self.producer.publish_message(
                 topic=KafkaTopic.NOTIFICATION_PUSH,
                 key=room_id,
-                message=fcm_request.model_dump(mode='json'),
+                message=event.model_dump(mode='json'),
             )
 
             if not publish_success:

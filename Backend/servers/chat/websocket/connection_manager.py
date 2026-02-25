@@ -4,7 +4,7 @@ from typing import Dict, Any
 from commons.logger import get_marigold_logger
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
-from dto.message_dto import RequestMessageToFCMDTO, MessageDTO
+from dto.message_dto import MessageDTO
 from models.messages import BaseMessage
 
 
