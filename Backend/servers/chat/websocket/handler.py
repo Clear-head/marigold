@@ -91,23 +91,22 @@ class WebSocketHandler:
                 await self._send_error(user_id, f"Unsupported message type: {request.message_type}")
                 return
 
-            # Service 호출 (DB 저장 + Kafka 발행)
             await self.chat_service.send_message(request.room_id, message)
 
             # DB에서 방 멤버 조회
             chat_room = await self.room_service.repo.get_room_by_id(room_id=request.room_id)
             if chat_room:
-                # 실시간 브로드캐스트 (온라인 사용자에게만)
-                await self.connection_manager.broadcast_to_users(
+                # 실시간 브로드캐스트
+                offline_users = await self.connection_manager.broadcast_to_users(
                     user_ids=chat_room.members,
-                    message={
-                        "message_type": request.message_type.value,
-                        "room_id": request.room_id,
-                        "sender_id": user_id,
-                        "content": request.content if request.message_type == MessageTypeEnum.TEXT else None,
-                        "media": request.media.model_dump() if request.media else None,
-                        "timestamp": message.send_at.isoformat()
-                    }
+                    message=message
+                )
+
+                #   오프라인 유저 알림
+                await self.chat_service.send_message_to_offline(
+                    user_id=offline_users,
+                    room_id=request.room_id,
+                    message=message
                 )
 
             self.logger.info(f"Message sent: user={user_id}, room={request.room_id}, type={request.message_type}")

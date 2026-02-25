@@ -1,10 +1,11 @@
+from asyncio import gather
 from datetime import datetime
 
 from commons.logger import get_marigold_logger
 from kafka.producer import kafka_producer
 from kafka.topics import KafkaTopic
 
-from dto.chat_room_dto import InviteChatRoomDto, CreateChatRoomDto, ExiteChatRoomDto, ResponseGetChatRoomDto
+from dto.chat_room_dto import InviteChatRoomDto, CreateChatRoomDto, ExitChatRoomDto, ResponseGetChatRoomDto
 from exceptions.room_exceptions import (
     RoomNotFoundException,
     UserAlreadyInRoomException,
@@ -24,7 +25,7 @@ class RoomService:
         self.repo = ChatRoomRepository()
         self.chat_repo = MessageRepository()
         self.topic = KafkaTopic.CHAT_ROOM
-        self.chat = ChatService()
+        self.chat_service = ChatService()
 
 
     async def get_rooms(self, user_id: str) -> ResponseGetChatRoomDto:
@@ -65,7 +66,7 @@ class RoomService:
                 send_at=datetime.now(),
                 content=f"{request.target_user_id}님이 입장하셨습니다."
             )
-            await self.chat.send_message(str(chat_room.id), msg)
+            await self.chat_service.send_message(str(chat_room.id), msg)
 
         except (RoomNotFoundException, UserAlreadyInRoomException) as e:
             raise e
@@ -84,7 +85,7 @@ class RoomService:
             self.logger.error(f"Failed to create chat room: {e}")
             raise
 
-    async def exit_chat_room(self, request: ExiteChatRoomDto):
+    async def exit_chat_room(self, request: ExitChatRoomDto):
         """채팅방 나가기"""
         try:
             chat_room = await self.repo.get_room_by_id(room_id=request.room_id)
@@ -105,8 +106,10 @@ class RoomService:
 
             # 멤버가 없으면 채팅방 삭제, 있으면 업데이트
             if not chat_room.members:
-                await self.chat_repo.delete_all_messages_in_room(room_id=str(chat_room.id))
-                await self.repo.remove_room(room_id=str(chat_room.id))
+                await gather(
+                    self.chat_repo.delete_all_messages_in_room(room_id=str(chat_room.id)),
+                    self.repo.remove_room(room_id=str(chat_room.id))
+                )
             else:
                 await self.repo.update_room(room_id=str(chat_room.id), target_room=chat_room)
 
@@ -115,4 +118,21 @@ class RoomService:
 
         except Exception as e:
             self.logger.error(f"Failed to exit chat room: {e}")
+            raise e
+
+    async def exit_all_chat_room(self, user_id: str):
+        """유저 탈퇴 시 전부 삭제"""
+        try:
+            exit_dtos = [
+                ExitChatRoomDto(
+                    exit_user_id=user_id,
+                    room_id=str(i.id)
+                )
+                for i in await self.repo.get_rooms_by_user_id(user_id)
+            ]
+            await gather(
+                *[self.exit_chat_room(dto) for dto in exit_dtos]
+            )
+
+        except (RoomNotFoundException, UserNotInRoomException) as e:
             raise e

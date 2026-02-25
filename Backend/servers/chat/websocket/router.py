@@ -2,6 +2,7 @@ import asyncio
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
 
 from commons.logger import get_marigold_logger
+from commons.validate_jwt import JWTValidator
 from services.chat_services import ChatService
 from services.room_services import RoomService
 from websocket.connection_manager import WSConnectionManager
@@ -11,6 +12,7 @@ from websocket.handler import WebSocketHandler
 logger = get_marigold_logger(__name__)
 websocket_router = APIRouter()
 
+jwt_validator = JWTValidator()
 connection_manager = WSConnectionManager()
 chat_service = ChatService()
 room_service = RoomService()
@@ -46,12 +48,19 @@ async def _heartbeat_task(user_id: str, websocket: WebSocket, interval: int = 30
         logger.debug(f"Heartbeat task stopped for user {user_id}: {e}")
 
 
-@websocket_router.websocket("/ws/chat/{user_id}")
+@websocket_router.websocket("/ws/chat")
 async def chat_websocket(
     websocket: WebSocket,
-    user_id: str,
     handler: WebSocketHandler = Depends(get_websocket_handler)
 ) -> None:
+    # JWT 검증
+    try:
+        payload = await jwt_validator.verify_jwt_websocket(websocket)
+    except Exception as e:
+        logger.warning(f"WebSocket authentication failed: {e}")
+        return
+
+    user_id = payload["userId"]
     logger.info(f"WebSocket connection attempt from user: {user_id}")
     heartbeat_task = None
 

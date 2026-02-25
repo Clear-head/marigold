@@ -17,7 +17,7 @@ class MediaMeta(BaseModel):
 
 
 class BaseMessage(Document):
-    _id: Optional[PydanticObjectId] = None
+    id: Optional[PydanticObjectId] = None
     room_id: PydanticObjectId
     sender_id: str
     send_at: datetime

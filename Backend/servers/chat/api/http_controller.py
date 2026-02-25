@@ -8,7 +8,7 @@ from starlette.responses import JSONResponse
 
 from services.chat_services import ChatService
 from services.room_services import RoomService
-from dto.chat_room_dto import CreateChatRoomDto, InviteChatRoomDto, ExiteChatRoomDto
+from dto.chat_room_dto import CreateChatRoomDto, InviteChatRoomDto, ExitChatRoomDto
 
 
 router = APIRouter(prefix="/api/chat", tags=["Chat"])
@@ -56,7 +56,7 @@ async def create_room(
 @router.delete("/rooms", status_code=status.HTTP_204_NO_CONTENT)
 async def exit_room(
     authorization: Annotated[str, Header()],
-    request: ExiteChatRoomDto
+    request: ExitChatRoomDto
 ):
     """채팅방 나가기"""
     # JWT 검증

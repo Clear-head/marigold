@@ -2,6 +2,8 @@ from datetime import datetime
 from enum import Enum
 from pydantic import BaseModel
 
+from models.messages import BaseMessage
+
 
 class MessageTypeEnum(str, Enum):
     TEXT = "text"
@@ -33,7 +35,6 @@ class MessageRequest(BaseModel):
 
 # 서버 응답 및 DB 저장용 DTO
 class MessageDTO(BaseModel):
-    _id: str = None
     message_type: MessageTypeEnum
     sender_id: str
     send_at: datetime = datetime.now()
@@ -48,3 +49,9 @@ class RequestMessageDTO(BaseModel):
 
 class ResponseMessagesDTO(BaseModel):
     messages: list[MessageDTO]
+
+
+class RequestMessageToFCMDTO(BaseModel):
+    messages: BaseMessage
+    user_ids: list[str]
+    room_id: str

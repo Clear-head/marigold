@@ -1,7 +1,11 @@
-from typing import Dict
+from asyncio import gather
+from typing import Dict, Any
 
 from commons.logger import get_marigold_logger
 from starlette.websockets import WebSocket, WebSocketDisconnect
+
+from dto.message_dto import RequestMessageToFCMDTO, MessageDTO
+from models.messages import BaseMessage
 
 
 class WSConnectionManager:
@@ -65,17 +69,18 @@ class WSConnectionManager:
             self.logger.error(f"Failed to send message to {user_id}: {e}")
             await self.disconnect(user_id)
 
-    async def broadcast_to_users(self, user_ids: list[str], message: dict) -> None:
+    async def broadcast_to_users(self, user_ids: list[str], message: BaseMessage) -> list[Any] | None:
         try:
             sent_count = 0
             failed_users = []
+            offline_users = []
 
             for user_id in user_ids:
                 # 온라인 사용자에게만 전송
                 if user_id in self.activate_users:
                     try:
                         websocket = self.activate_users[user_id]
-                        await websocket.send_json(message)
+                        await websocket.send_json(message.model_dump(mode='json'))
                         sent_count += 1
 
                     except WebSocketDisconnect:
@@ -85,12 +90,20 @@ class WSConnectionManager:
                     except Exception as e:
                         self.logger.error(f"Failed to send to {user_id}: {e}")
                         failed_users.append(user_id)
+                else:
+                    #   오프라인 유저 추가
+                    offline_users.append(user_id)
 
             # 실패한 연결 정리
-            for user_id in failed_users:
-                await self.disconnect(user_id)
+            await gather(
+                *[self.disconnect(i) for i in failed_users]
+            )
+
+            offline_users.extend(failed_users)
 
             self.logger.info(f"Broadcast to {sent_count}/{len(user_ids)} online users")
+
+            return offline_users
 
         except Exception as e:
             self.logger.error(f"Error broadcasting to users: {e}")

@@ -11,8 +11,8 @@ class InviteChatRoomDto(BaseModel):
     sender_id: str
 
 
-class ExiteChatRoomDto(BaseModel):
-    room_id: str
+class ExitChatRoomDto(BaseModel):
+    room_id: str | None = None
     exit_user_id: str
 
 

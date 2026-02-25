@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from commons.logger import get_marigold_logger
+
+from dto.message_dto import RequestMessageToFCMDTO
 from exceptions.message_exceptions import MessageSendFailedException
 from kafka.producer import kafka_producer
 from kafka.topics import KafkaTopic
@@ -41,6 +43,28 @@ class ChatService:
         except Exception as e:
             self.logger.error(f"Failed to send message to room {room_id}: {e}")
             raise MessageSendFailedException(reason=str(e))
+
+    async def send_message_to_offline(self, user_id: list[str], message: BaseMessage, room_id: str):
+        try:
+
+            fcm_request = RequestMessageToFCMDTO(
+                user_ids=user_id,
+                messages=message,
+                room_id=room_id
+            )
+
+            #   notification 으로 발행
+            publish_success = await self.producer.publish_message(
+                topic=KafkaTopic.NOTIFICATION_PUSH,
+                key=room_id,
+                message=fcm_request.model_dump(mode='json'),
+            )
+
+            if not publish_success:
+                self.logger.warning(f"Failed to publish message to Kafka for room {room_id}")
+
+        except Exception as e:
+            self.logger.error(f"Failed to send message to room {room_id}: {e}")
 
     async def get_messages(self, room_id: str, last_msg_id: str = None, limit: int = 20):
         try:
