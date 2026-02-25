@@ -49,11 +49,7 @@ class AIRequest(BaseModel):
     chat -> ai
     topic: AI_REQUEST
     """
-    room_id: str
-    user_id: str
-    prompt: str
-    requested_at: datetime
-
+    pass
 
 class CalendarNotification(BaseModel):
     """
@@ -61,8 +57,4 @@ class CalendarNotification(BaseModel):
     calendar -> notification
     topic: CALENDAR_EVENT
     """
-    user_id: str
-    event_id: str
-    title: str
-    scheduled_at: datetime
-    notify_at: datetime
+    pass
