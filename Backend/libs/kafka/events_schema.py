@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 
 class NotificationToOfflineUsers(BaseModel):
@@ -13,9 +13,20 @@ class NotificationToOfflineUsers(BaseModel):
     user_ids: list[str]
     room_id: str
     sender_id: str
-    message_type: str       # text, image, video
+    message_type: Literal["text", "image", "video"]
     message_preview: str    # 알림에 표시할 미리보기 텍스트
     sent_at: datetime
+
+    @model_validator(mode="before")
+    @classmethod
+    def set_message_preview(cls, v):
+        if isinstance(v, dict):
+            msg_type = v.get("message_type")
+            if msg_type == "image":
+                v["message_preview"] = "사진"
+            elif msg_type == "video":
+                v["message_preview"] = "동영상"
+        return v
 
 
 class SignupRequest(BaseModel):
