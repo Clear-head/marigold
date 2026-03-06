@@ -31,6 +31,6 @@ async def login(user_id: str, password: str) -> bool:
 
     except Exception as e:
         logger.error(f"Unexpected error during login: {e}")
-        raise e(f"Login failed: {str(e)}")
+        raise e
 
     
