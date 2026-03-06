@@ -4,13 +4,11 @@
 
 from libs.commons.logger import get_marigold_logger
 from models.user import User
-from libs.databases.mongo_client import get_mongo_client
 from typing import List
 
 class UserRepository:
     def __init__(self):
         self.logger = get_marigold_logger(__name__)
-        self.client = get_mongo_client()
         self.document = User
 
     async def create_user(self, user:User) -> User:

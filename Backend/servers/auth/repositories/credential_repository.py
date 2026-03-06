@@ -10,7 +10,6 @@ from typing import List
 class CredentialRepository:
     def __init__(self):
         self.logger = get_marigold_logger(__name__)
-        self.client = get_mongo_client()
         self.document = UserCredential
 
     async def create_credential(self, credential: UserCredential) -> UserCredential:
