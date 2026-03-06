@@ -1,13 +1,13 @@
 # Backend\servers\auth\services\auth_service.py
 # 인증 서비스
 
-from libs.commons.logger import get_marigold_logger
+from commons.logger import get_marigold_logger
 from repositories.token_repository import TokenRepository
-from libs.commons.validate_jwt import JWTValidator
-from libs.commons.settings import settings
+from commons.validate_jwt import JWTValidator
+from commons.settings import settings
 from datetime import datetime, timedelta
 import jwt
-from libs.exceptions.auth_exceptions import TokenExpiredException
+from exceptions.auth_exceptions import TokenExpiredException
 
 class IssueJWTService:
     def __init__(self):

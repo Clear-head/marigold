@@ -1,10 +1,18 @@
 # Backend\servers\auth\services\login_service.py
 # 로그인 서비스
-
 from repositories.credential_repository import CredentialRepository
-from libs.commons.logger import get_marigold_logger
-from libs.exceptions.auth_exceptions import UserNotFoundException, InvalidPasswordException
-from services.hasher import verify_password
+from commons.logger import get_marigold_logger
+from exceptions.auth_exceptions import UserNotFoundException, InvalidPasswordException
+from services.hasher import verify_password, hash_password
+
+from exceptions.auth_exceptions import TokenExpiredException
+from kafka.producer import KafkaProducer
+from kafka.events_schema import SignupRequest as KafkaSR
+from kafka.topics import USER_AUTH
+from dto.dto import SignupRequest
+
+from kafka.topics import KafkaTopic
+from models import UserCredential
 
 logger = get_marigold_logger(__name__)
 
@@ -33,4 +41,31 @@ async def login(user_id: str, password: str) -> bool:
         logger.error(f"Unexpected error during login: {e}")
         raise e
 
-    
+async def signup(dto: SignupRequest):
+    try:
+
+        repo = CredentialRepository()
+        credential = UserCredential(
+            id=dto.user_id,
+            password_hased=hash_password(dto.password),
+        )
+
+        repo.create_credential(credential)
+
+        producer = KafkaProducer()
+        kafka_signup = KafkaSR(
+            user_id = dto.user_id,
+            name = dto.name,
+            phone = dto.phone,
+            birth = dto.birth,
+            created_at = dto.created_at,
+        )
+        await producer.publish_message(
+            message=kafka_signup.model_dump(mode="json"),
+            topics=KafkaTopic.USER_AUTH,
+            key=dto.user_id,
+        )
+
+    except Exception as e:
+        logger.error(e)
+        raise e

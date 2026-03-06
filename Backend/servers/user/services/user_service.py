@@ -1,11 +1,16 @@
 # Backend/servers/user/services/user_service.py
+from datetime import datetime
 
 from repositories.user_repository import UserRepository
-from libs.commons.logger import get_marigold_logger
+from commons.logger import get_marigold_logger
+from kafka.events_schema import SignupRequest
 
 from dto.change_name_dto import RequestChangeName, ResponseChangeName
 from dto.change_phone_dto import RequestChangePhone, ResponseChangePhone
 from dto.change_birth_dto import RequestChangeBirth, ResponseChangeBirth
+from models.user import User
+
+
 
 class UserService:
     # TODO 
@@ -58,4 +63,18 @@ class UserService:
                 'msg' : f'Changed birth to {target_user.birth}'
             }
         )
-        
+
+    async def signup(self, dto: SignupRequest):
+        try:
+            new_user = User(
+                id = dto.user_id,
+                name = dto.name,
+                phone = dto.phone,
+                birth = datetime.strptime(dto.birth, '%Y-%m-%d'),
+                created_at = dto.created_at,
+            )
+            await self.repo.create_user(new_user)
+
+        except Exception as e:
+            self.logger.error(e)
+            raise e

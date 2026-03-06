@@ -2,9 +2,8 @@
 # beanie
 # logger, client, document
 
-from libs.commons.logger import get_marigold_logger
+from commons.logger import get_marigold_logger
 from models.credential import UserCredential
-from libs.databases.mongo_client import get_mongo_client
 from typing import List
 
 class CredentialRepository:

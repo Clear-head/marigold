@@ -1,4 +1,5 @@
 # Backend\servers\auth\dto\dto.py
+from datetime import datetime
 
 from pydantic import BaseModel
 
@@ -17,3 +18,7 @@ class TokenResponse(BaseModel):
 class SignupRequest(BaseModel):
     user_id: str
     password: str
+    name: str
+    phone: str
+    birth: datetime
+    created_at: datetime
