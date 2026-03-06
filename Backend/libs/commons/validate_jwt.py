@@ -1,11 +1,10 @@
 import jwt
 
-from Backend.libs.commons.logger import get_marigold_logger
-from Backend.libs.databases.redis_client import get_redis_client
-from Backend.libs.exceptions.auth_exceptions import (
+from commons.logger import get_marigold_logger
+from databases.redis_client import get_redis_client
+from exceptions.auth_exceptions import (
     InvalidTokenException, NoActiveSessionException,
     RedisConnectionException, TokenExpiredException,
-    TokenRevokedException, InvalidTokenTypeException
 )
 from settings import settings
 

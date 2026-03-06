@@ -8,3 +8,5 @@ async def init_database(connection_url: str, db_name: str, models: str):
         database=client[db_name],
         document_models=models
     )
+
+    return client
