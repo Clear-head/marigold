@@ -91,6 +91,30 @@ class MaxDevicesExceededException(AuthException):
         )
 
 
+# ==================== 사용자/자격증명 에러 (401) ====================
+
+class UserNotFoundException(AuthException):
+    """사용자를 찾을 수 없음"""
+
+    def __init__(self, detail: str = "User not found"):
+        super().__init__(
+            detail=detail,
+            error_code="USER_NOT_FOUND",
+            status_code=401
+        )
+
+
+class InvalidPasswordException(AuthException):
+    """비밀번호 불일치"""
+
+    def __init__(self, detail: str = "Invalid password"):
+        super().__init__(
+            detail=detail,
+            error_code="INVALID_PASSWORD",
+            status_code=401
+        )
+
+
 # ==================== 인프라 에러 (500) ====================
 
 class RedisConnectionException(AuthException):
