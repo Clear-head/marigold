@@ -58,7 +58,7 @@ class IssueJWTService:
             }
         except Exception as e:
             self.logger.error(f"Unexpected error during issue tokens: {e}")
-            raise e(f"Issue tokens failed: {str(e)}")
+            raise e
     
     async def refresh_token(self, user_id: str, refresh_token: str) -> str:
         try:
@@ -83,7 +83,7 @@ class IssueJWTService:
 
         except Exception as e:
             self.logger.error(f"Unexpected error during refresh token: {e}")
-            raise e(f"Refresh token verification failed: {str(e)}")
+            raise e
         
 
     async def delete_tokens(self, user_id: str) -> bool:
