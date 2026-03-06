@@ -8,7 +8,7 @@ from services.user_service import UserService
 from dto.change_name_dto import RequestChangeName, ResponseChangeName
 from dto.change_phone_dto import RequestChangePhone, ResponseChangePhone
 from dto.change_birth_dto import RequestChangeBirth, ResponseChangeBirth
-from libs.commons.validate_jwt import JWTValidator
+from commons.validate_jwt import JWTValidator
 
 router = APIRouter(
     prefix = "/user",

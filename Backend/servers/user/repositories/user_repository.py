@@ -2,7 +2,7 @@
 # beanie
 # logger, client, document
 
-from libs.commons.logger import get_marigold_logger
+from commons.logger import get_marigold_logger
 from models.user import User
 from typing import List
 

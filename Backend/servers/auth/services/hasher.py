@@ -2,9 +2,9 @@
 # password 해시 서비스
 # bcrypt
 
-from libs.commons.logger import get_marigold_logger
+from commons.logger import get_marigold_logger
 from bcrypt import hashpw, gensalt, checkpw
-from libs.exceptions.auth_exceptions import InvalidPasswordException
+from exceptions.auth_exceptions import InvalidPasswordException
 
 logger = get_marigold_logger(__name__)
 

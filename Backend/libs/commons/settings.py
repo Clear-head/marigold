@@ -22,7 +22,12 @@ class RootSettings(BaseSettings):
     OLLAMA_BASE_URL: str
 
     # Service Ports
+    AUTH_INTERNAL_PORT: int
+    CHAT_INTERNAL_PORT: int
+    AI_INTERNAL_PORT: int
+    CALENDAR_INTERNAL_PORT: int
     NOTIFICATION_INTERNAL_PORT: int
+    USER_INTERNAL_PORT: int
 
     # Firebase
     FIREBASE_CREDENTIALS_JSON: str

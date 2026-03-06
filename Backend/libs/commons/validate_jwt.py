@@ -6,7 +6,7 @@ from exceptions.auth_exceptions import (
     InvalidTokenException, NoActiveSessionException,
     RedisConnectionException, TokenExpiredException,
 )
-from settings import settings
+from commons.settings import settings
 
 
 
