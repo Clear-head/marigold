@@ -10,6 +10,7 @@ class RootSettings(BaseSettings):
     CHAT_DB_NAME: str
     AI_DB_NAME: str
     CALENDAR_DB_NAME: str
+    NOTIFICATION_DB_NAME: str
 
     # Kafka
     KAFKA_BOOTSTRAP_SERVERS: str
@@ -19,6 +20,12 @@ class RootSettings(BaseSettings):
 
     # Ollama
     OLLAMA_BASE_URL: str
+
+    # Service Ports
+    NOTIFICATION_INTERNAL_PORT: int
+
+    # Firebase
+    FIREBASE_CREDENTIALS_JSON: str
 
     # JWT
     JWT_SECRET_KEY: str
