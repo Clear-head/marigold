@@ -3,6 +3,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
 
 from commons.logger import get_marigold_logger
 from commons.validate_jwt import JWTValidator
+from databases.redis_client import get_redis_client
 from services.chat_services import ChatService
 from services.room_services import RoomService
 from websocket.connection_manager import WSConnectionManager
@@ -82,9 +83,24 @@ async def chat_websocket(
         while True:
             data = await websocket.receive_json()
 
-            # Pong 응답 처리 (클라이언트가 ping에 응답)
             if data.get("type") == "pong":
                 logger.debug(f"Pong received from user {user_id}")
+                try:
+                    redis_client = await get_redis_client()
+                    exists = await redis_client.exists(f"access_token_{user_id}")
+                    if not exists:
+                        logger.warning(f"Session expired during heartbeat for user {user_id}")
+                        await connection_manager.send_personal_message(
+                            user_id=user_id,
+                            message={
+                                "type": "session_expired",
+                                "message": "세션이 만료되었습니다. 다시 로그인해주세요."
+                            }
+                        )
+                        await websocket.close(code=4401, reason="Session expired")
+                        return
+                except Exception as e:
+                    logger.error(f"Redis check failed during heartbeat for user {user_id}: {e}")
                 continue
 
             logger.debug(f"Message received from {user_id}: {data}")
