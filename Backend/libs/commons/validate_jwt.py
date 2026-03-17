@@ -33,10 +33,11 @@ class JWTValidator:
 
                 try:
                     redis = await get_redis_client()
-                    # 해당 유저가 활성 세션을 가지고 있는지 확인
-                    session_count = await redis.zcard(f"user_tokens:{user_id}")
+                    token_type = payload.get("type")  # "access" or "refresh"
+                    redis_key = f"{token_type}_token_{user_id}"
+                    exists = await redis.exists(redis_key)
 
-                    if session_count == 0:
+                    if not exists:
                         raise NoActiveSessionException()
 
                 except NoActiveSessionException:
