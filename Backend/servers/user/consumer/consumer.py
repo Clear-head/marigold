@@ -1,4 +1,4 @@
-from typing import override
+from typing_extensions import override
 from aiokafka import ConsumerRecord
 from kafka.consumer import BaseKafkaConsumer
 from kafka.events_schema import SignupRequest

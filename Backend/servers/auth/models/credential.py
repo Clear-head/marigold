@@ -2,7 +2,7 @@
 # 로그인 로그아웃 보안 관리
 
 from datetime import datetime
-from beanie import Document, Field
+from beanie import Document
 
 class UserCredential(Document):
     id: str

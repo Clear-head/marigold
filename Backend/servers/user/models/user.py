@@ -1,6 +1,6 @@
 # Backend\servers\user\models\user.py
 
-from beanie import Document, Field
+from beanie import Document
 from datetime import datetime
 
 class User(Document):
@@ -8,7 +8,7 @@ class User(Document):
     name: str
     phone: str
     birth: datetime
-    created_at: datetime = Field(default_factory=datetime.now)
+    created_at: datetime = datetime.now()
 
     class Settings:
         name = "users"

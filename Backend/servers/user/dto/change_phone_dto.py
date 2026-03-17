@@ -1,10 +1,9 @@
 from pydantic import BaseModel
-from starlette.responses import JSONResponse
 
 class RequestChangePhone(BaseModel):
     new_phone: str
 
-class ResponseChangePhone(JSONResponse):
+class ResponseChangePhone(BaseModel):
     status_code: int
     content: dict
 

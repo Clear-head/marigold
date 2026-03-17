@@ -12,7 +12,7 @@ class CredentialRepository:
         self.document = UserCredential
 
     async def create_credential(self, credential: UserCredential) -> UserCredential:
-        return await self.document.create(credential)
+        return await credential.insert()
     
     async def update_credential(self, credential_id: str, credential: UserCredential) -> UserCredential:
         return await self.document.update_one(self.document.id == credential_id, credential)

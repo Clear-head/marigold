@@ -1,5 +1,5 @@
 from aiokafka import ConsumerRecord
-from typing import override
+from typing_extensions import override
 
 from kafka.consumer import BaseKafkaConsumer
 from kafka.events_schema import NotificationToOfflineUsers

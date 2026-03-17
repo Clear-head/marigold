@@ -9,7 +9,7 @@ from exceptions.auth_exceptions import InvalidPasswordException
 logger = get_marigold_logger(__name__)
 
 async def hash_password(password: str) -> str:
-    return hashpw(password.encode('utf-8'), gensalt())
+    return hashpw(password.encode('utf-8'), gensalt()).decode('utf-8')
 
 async def verify_password(input_password: str, hashed_password: str) -> bool:
     return checkpw(input_password.encode('utf-8'), hashed_password.encode('utf-8'))    

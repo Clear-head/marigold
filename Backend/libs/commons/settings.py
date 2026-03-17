@@ -11,6 +11,7 @@ class RootSettings(BaseSettings):
     AI_DB_NAME: str
     CALENDAR_DB_NAME: str
     NOTIFICATION_DB_NAME: str
+    USER_DB_NAME: str
 
     # Kafka
     KAFKA_BOOTSTRAP_SERVERS: str

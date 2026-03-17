@@ -39,7 +39,7 @@ class SignupRequest(BaseModel):
     user_id: str
     name: str
     phone: str
-    birth: str
+    birth: datetime
     created_at: datetime
 
 

@@ -6,7 +6,7 @@ from kafka.producer import kafka_producer
 from kafka.topics import KafkaTopic
 
 from dto.chat_room_dto import InviteChatRoomDto, CreateChatRoomDto, ExitChatRoomDto, ResponseGetChatRoomDto
-from exceptions.room_exceptions import (
+from chat_exceptions.room_exceptions import (
     RoomNotFoundException,
     UserAlreadyInRoomException,
     UserNotInRoomException

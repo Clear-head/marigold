@@ -2,7 +2,7 @@ from datetime import datetime
 
 from commons.logger import get_marigold_logger
 
-from exceptions.message_exceptions import MessageSendFailedException
+from chat_exceptions.message_exceptions import MessageSendFailedException
 from kafka.events_schema import NotificationToOfflineUsers
 from kafka.producer import kafka_producer
 from kafka.topics import KafkaTopic

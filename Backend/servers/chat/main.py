@@ -10,6 +10,7 @@ from commons.logger import get_marigold_logger
 from commons.settings import settings
 from databases.mongo_client import init_database
 from databases.redis_client import get_redis_client, close_redis_client
+from exceptions.auth_exceptions import AuthException
 from kafka.producer import kafka_producer
 from kafka.topics import KafkaTopic
 from kafka_consumer.from_user_consumer import UserConsumer
@@ -17,7 +18,7 @@ from models.chat_room import ChatRoom
 from models.messages import TextMessage, ImageMessage, VideoMessage
 from api.http_controller import router as http_router
 from websocket.router import websocket_router
-from exceptions.base import ChatServiceException
+from chat_exceptions.base import ChatServiceException
 
 logger = get_marigold_logger(__name__)
 
@@ -70,6 +71,15 @@ async def chat_service_exception_handler(request: Request, exc: ChatServiceExcep
     return JSONResponse(
         status_code=exc.status_code,
         content=exc.to_dict()
+    )
+
+
+@app.exception_handler(AuthException)
+async def auth_exception_handler(request: Request, exc: AuthException):
+    logger.warning(f"AuthException: {exc.error_code} - {exc.detail}")
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"error_code": exc.error_code, "detail": exc.detail}
     )
 
 
