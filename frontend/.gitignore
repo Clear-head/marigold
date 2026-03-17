@@ -43,3 +43,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase configuration (sensitive - do not commit)
+google-services.json
+GoogleService-Info.plist
+firebase.json
+lib/firebase_options.dart
+
+# Environment variables (sensitive - do not commit)
+.env
