@@ -8,11 +8,10 @@ from services.hasher import verify_password, hash_password
 from exceptions.auth_exceptions import TokenExpiredException
 from kafka.producer import KafkaProducer
 from kafka.events_schema import SignupRequest as KafkaSR
-from kafka.topics import USER_AUTH
 from dto.dto import SignupRequest
 
 from kafka.topics import KafkaTopic
-from models import UserCredential
+from models.credential import UserCredential
 
 logger = get_marigold_logger(__name__)
 
@@ -47,10 +46,10 @@ async def signup(dto: SignupRequest):
         repo = CredentialRepository()
         credential = UserCredential(
             id=dto.user_id,
-            password_hased=hash_password(dto.password),
+            password_hased= await hash_password(dto.password),
         )
 
-        repo.create_credential(credential)
+        await repo.create_credential(credential)
 
         producer = KafkaProducer()
         kafka_signup = KafkaSR(
@@ -62,7 +61,7 @@ async def signup(dto: SignupRequest):
         )
         await producer.publish_message(
             message=kafka_signup.model_dump(mode="json"),
-            topics=KafkaTopic.USER_AUTH,
+            topic=KafkaTopic.USER_AUTH,
             key=dto.user_id,
         )
 

@@ -4,11 +4,11 @@
 # 비밀번호만 인증하는 라우터가 필요함
 
 from fastapi import APIRouter, status, Header, Depends, HTTPException
-from dto.dto import LoginRequest, TokenResponse, SignupRequest, LoginResponse
 from typing import Annotated
 
+from dto.dto import LoginRequest, TokenResponse, SignupRequest, LoginResponse
 from services.auth_service import IssueJWTService
-from services.login_service import login
+from services.login_service import login, signup
 
 router = APIRouter(
     prefix="/auth",
@@ -58,7 +58,7 @@ async def refresh_token_endpoint(
 
 @router.post("/users", status_code=status.HTTP_201_CREATED)
 async def signup_endpoint(request: SignupRequest):
-    pass
+    await signup(request)
 
 @router.delete("/users", status_code=status.HTTP_204_NO_CONTENT)
 async def withdraw_endpoint(user_id: str):
