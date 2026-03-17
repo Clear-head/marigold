@@ -6,7 +6,7 @@ from exceptions.auth_exceptions import UserNotFoundException, InvalidPasswordExc
 from services.hasher import verify_password, hash_password
 
 from exceptions.auth_exceptions import TokenExpiredException
-from kafka.producer import KafkaProducer
+from kafka.producer import kafka_producer
 from kafka.events_schema import SignupRequest as KafkaSR
 from dto.dto import SignupRequest
 
@@ -51,7 +51,6 @@ async def signup(dto: SignupRequest):
 
         await repo.create_credential(credential)
 
-        producer = KafkaProducer()
         kafka_signup = KafkaSR(
             user_id = dto.user_id,
             name = dto.name,
@@ -59,7 +58,7 @@ async def signup(dto: SignupRequest):
             birth = dto.birth,
             created_at = dto.created_at,
         )
-        await producer.publish_message(
+        await kafka_producer.publish_message(
             message=kafka_signup.model_dump(mode="json"),
             topic=KafkaTopic.USER_AUTH,
             key=dto.user_id,
