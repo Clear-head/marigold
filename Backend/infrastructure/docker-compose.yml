@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mongodb:
     image: mongo:latest
@@ -26,6 +24,8 @@ services:
     ports:
       - "${REDIS_EXTERNAL_PORT}:${REDIS_INTERNAL_PORT}"
     command: redis-server --requirepass ${REDIS_PASSWORD} --port ${REDIS_INTERNAL_PORT}
+    volumes:
+      - redis_data:/data
     networks:
       - marigold-backend
     restart: unless-stopped
@@ -47,47 +47,47 @@ services:
       KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:${KAFKA_EXTERNAL_PORT},INTERNAL://kafka:${KAFKA_INTERNAL_PORT}
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:${KAFKA_CONTROLLER_PORT}
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:${KAFKA_CONTROLLER_PORT}
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     networks:
       - marigold-backend
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "kafka-broker-api-versions.sh --bootstrap-server localhost:${KAFKA_EXTERNAL_PORT} || exit 1"]
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:${KAFKA_EXTERNAL_PORT} || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
 
-  chromadb:
-    image: chromadb/chroma:latest
-    container_name: marigold-chroma
-    ports:
-      - "${CHROMA_EXTERNAL_PORT}:${CHROMA_INTERNAL_PORT}"
-    networks:
-      - marigold-backend
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${CHROMA_INTERNAL_PORT}/api/v1/heartbeat"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  ollama:
-    image: ollama/ollama:latest
-    container_name: marigold-ollama
-    ports:
-      - "${OLLAMA_EXTERNAL_PORT}:${OLLAMA_INTERNAL_PORT}"
-    volumes:
-      - ollama_data:/root/.ollama
-    networks:
-      - marigold-backend
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${OLLAMA_INTERNAL_PORT}/api/tags"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+#  chromadb:
+#    image: chromadb/chroma:latest
+#    container_name: marigold-chroma
+#    ports:
+#      - "${CHROMA_EXTERNAL_PORT}:${CHROMA_INTERNAL_PORT}"
+#    networks:
+#      - marigold-backend
+#    restart: unless-stopped
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:${CHROMA_INTERNAL_PORT}/api/v1/heartbeat"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+#
+#  ollama:
+#    image: ollama/ollama:latest
+#    container_name: marigold-ollama
+#    ports:
+#      - "${OLLAMA_EXTERNAL_PORT}:${OLLAMA_INTERNAL_PORT}"
+#    volumes:
+#      - ollama_data:/root/.ollama
+#    networks:
+#      - marigold-backend
+#    restart: unless-stopped
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:${OLLAMA_INTERNAL_PORT}/api/tags"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
 
   auth-service:
     build:
@@ -156,10 +156,10 @@ services:
     depends_on:
       mongodb:
         condition: service_healthy
-      chromadb:
-        condition: service_healthy
-      ollama:
-        condition: service_healthy
+#      chromadb:
+#        condition: service_healthy
+#      ollama:
+#        condition: service_healthy
       kafka:
         condition: service_healthy
     networks:
@@ -248,4 +248,5 @@ networks:
 
 volumes:
   mongo_data:
-  ollama_data:
+  redis_data:
+#  ollama_data:

@@ -50,8 +50,8 @@ class IssueJWTService:
             access_token = await self._create_access_token(user_id)
             refresh_token = await self._create_refresh_token(user_id)
 
-            await self.token_repository.create_redis_item(f"access_token_{user_id}", access_token)
-            await self.token_repository.create_redis_item(f"refresh_token_{user_id}", refresh_token)
+            await self.token_repository.create_redis_item(f"access_token_{user_id}", access_token, ex=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60)
+            await self.token_repository.create_redis_item(f"refresh_token_{user_id}", refresh_token, ex=settings.REFRESH_TOKEN_EXPIRE_MINUTES * 60)
             return {
                 f"access_token_{user_id}": access_token,
                 f"refresh_token_{user_id}": refresh_token
@@ -69,8 +69,8 @@ class IssueJWTService:
             access_token = await self._create_access_token(user_id)
             refresh_token = await self._create_refresh_token(user_id)
             
-            await self.token_repository.update_redis_item(f"access_token_{user_id}", access_token)
-            await self.token_repository.update_redis_item(f"refresh_token_{user_id}", refresh_token)
+            await self.token_repository.update_redis_item(f"access_token_{user_id}", access_token, ex=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60)
+            await self.token_repository.update_redis_item(f"refresh_token_{user_id}", refresh_token, ex=settings.REFRESH_TOKEN_EXPIRE_MINUTES * 60)
 
             return {
                 f"access_token_{user_id}": access_token,
