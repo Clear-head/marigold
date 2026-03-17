@@ -1,7 +1,7 @@
 # ==================== Build Stage ====================
 FROM --platform=${BUILDPLATFORM:-linux/amd64} python:3.11-slim AS builder
 
-ENV POETRY_VERSION=1.7.1 \
+ENV POETRY_VERSION=2.2.1 \
     POETRY_HOME=/opt/poetry \
     POETRY_VIRTUALENVS_CREATE=false \
     POETRY_NO_INTERACTION=1
@@ -28,7 +28,8 @@ FROM python:3.11-slim AS runtime
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PATH="/root/.local/bin:$PATH"
+    PATH="/root/.local/bin:$PATH" \
+    PYTHONPATH="/app/libs:/app/servers/notification"
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
