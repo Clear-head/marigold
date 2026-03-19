@@ -15,7 +15,7 @@ class UserRepository:
         return await self.document.create(user)
     
     async def update_user(self, user_id:str, user:User) -> User:
-        return await self.document.update_one(self.document.id == user_id, user)
+        return await user.replace()
 
     async def delete_user(self, user_id:str) -> User:
         return await self.document.delete_one(self.document.id == user_id)
