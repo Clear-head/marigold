@@ -7,6 +7,7 @@ import '../../../../core/providers/core_providers.dart';
 import '../../../chat/presentation/providers/chat_providers.dart';
 import '../../../chat/presentation/screens/chat_rooms_screen.dart';
 import '../../../friends/presentation/screens/friend_list_screen.dart';
+import '../../../settings/presentation/screens/settings_screen.dart';
 
 class MainShellScreen extends ConsumerStatefulWidget {
   const MainShellScreen({super.key});
@@ -71,7 +72,7 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
         children: const [
           FriendListScreen(),
           ChatRoomsScreen(),
-          _SettingsPlaceholder(),
+          SettingsScreen(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -99,15 +100,3 @@ class _MainShellScreenState extends ConsumerState<MainShellScreen> {
   }
 }
 
-class _SettingsPlaceholder extends StatelessWidget {
-  const _SettingsPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('설정 (구현 예정)', style: TextStyle(color: Colors.grey)),
-      ),
-    );
-  }
-}

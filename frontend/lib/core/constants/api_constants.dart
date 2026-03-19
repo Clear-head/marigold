@@ -31,6 +31,14 @@ class ApiConstants {
   static String notificationTokenByDevice(String deviceId) =>
       '/notification/tokens/$deviceId';
 
+  // User API Endpoints
+  static const String userSearch = '/user/';
+  static const String userFriends = '/user/friends';
+  static const String userBlocks = '/user/blocks';
+  static const String userName = '/user/name';
+  static const String userPhone = '/user/phone';
+  static const String userBirth = '/user/birth';
+
   // Timeouts
   static const Duration connectTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);

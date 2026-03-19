@@ -49,6 +49,18 @@ final authDioClientProvider = Provider<DioClient>((ref) {
   );
 });
 
+/// DioClient Provider (User Service)
+final userDioClientProvider = Provider<DioClient>((ref) {
+  final tokenStorage = ref.watch(tokenStorageProvider);
+  final logger = ref.watch(loggerProvider);
+
+  return DioClient(
+    tokenStorage: tokenStorage,
+    logger: logger,
+    baseUrl: ApiConstants.userBaseUrl,
+  );
+});
+
 /// DioClient Provider (Notification Service)
 final notificationDioClientProvider = Provider<DioClient>((ref) {
   final tokenStorage = ref.watch(tokenStorageProvider);
