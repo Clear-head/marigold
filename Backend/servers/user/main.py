@@ -9,7 +9,6 @@ from commons.settings import settings
 from databases.mongo_client import init_database
 from kafka.topics import KafkaTopic
 
-from Backend.servers.auth.api import auth_router
 from models.user import User
 from api.user_router import router
 from api.friendship_router import friends_router
