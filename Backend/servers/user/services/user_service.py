@@ -1,6 +1,4 @@
 # Backend/servers/user/services/user_service.py
-from datetime import datetime
-
 from repositories.user_repository import UserRepository
 from commons.logger import get_marigold_logger
 from kafka.events_schema import SignupRequest
@@ -70,7 +68,7 @@ class UserService:
                 id = dto.user_id,
                 name = dto.name,
                 phone = dto.phone,
-                birth = datetime.strptime(dto.birth, '%Y-%m-%d'),
+                birth = dto.birth,
                 created_at = dto.created_at,
             )
             await self.repo.create_user(new_user)
