@@ -1,5 +1,8 @@
 # Backend/servers/user/services/user_service.py
+import asyncio
+
 from repositories.user_repository import UserRepository
+from repositories.friends_repository import FriendsRepository
 from commons.logger import get_marigold_logger
 from kafka.events_schema import SignupRequest
 
@@ -7,7 +10,7 @@ from dto.change_name_dto import RequestChangeName, ResponseChangeName
 from dto.change_phone_dto import RequestChangePhone, ResponseChangePhone
 from dto.change_birth_dto import RequestChangeBirth, ResponseChangeBirth
 from models.user import User
-
+from models.friendship import Friendship
 
 
 class UserService:
@@ -19,6 +22,7 @@ class UserService:
     def __init__(self):
         self.logger = get_marigold_logger(__name__)
         self.repo = UserRepository()
+        self.friend_repo = FriendsRepository()
     
     async def change_name(self, name_info: RequestChangeName, user_id: str):
         """
@@ -71,7 +75,17 @@ class UserService:
                 birth = dto.birth,
                 created_at = dto.created_at,
             )
-            await self.repo.create_user(new_user)
+
+            new_friendship = Friendship(
+                user_id = dto.user_id,
+                friends = [],
+                ban = []
+            )
+
+            await asyncio.gather(
+                self.repo.create_user(new_user),
+                self.friend_repo.create_friends(new_friendship),
+            )
 
         except Exception as e:
             self.logger.error(e)
