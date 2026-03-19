@@ -49,10 +49,8 @@ async def refresh_token_endpoint(
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    refresh_token = authorization.split(" ")[1]
-    
     auth_service = IssueJWTService()
-    new_tokens = await auth_service.refresh_token(user_id, refresh_token)
+    new_tokens = await auth_service.refresh_token(user_id, authorization)
     
     return TokenResponse(access_token=new_tokens[f"access_token_{user_id}"], refresh_token=new_tokens[f"refresh_token_{user_id}"])
 
