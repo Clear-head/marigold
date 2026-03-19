@@ -9,6 +9,7 @@ from commons.settings import settings
 from databases.mongo_client import init_database
 from kafka.topics import KafkaTopic
 
+from models.friendship import Friendship
 from models.user import User
 from api.user_router import router
 from api.friendship_router import friends_router
@@ -24,7 +25,7 @@ async def lifespan(app: FastAPI):
         await init_database(
             connection_url=settings.MONGO_URL,
             db_name=settings.USER_DB_NAME,
-            models=[User]
+            models=[User, Friendship]
         )
 
         auth_consumer = AuthConsumer(

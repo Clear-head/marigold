@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Header
+from fastapi import APIRouter, Header, Depends
 
 from commons.validate_jwt import JWTValidator
 from services.friends_service import add_friend, get_friends, delete_friend, ban_friend, unbanned_friends, get_banned_friends
@@ -26,7 +26,10 @@ async def add_friends(request: FriendDto, authorization: Annotated[str, Header()
 
 
 @friends_router.delete("/friends")
-async def delete_friends(request: FriendDto, authorization: Annotated[str, Header()]):
+async def delete_friends(
+    request: Annotated[FriendDto, Depends()],
+    authorization: Annotated[str, Header()]
+):
     user_id = (await jwt_validator.verify_jwt_http(authorization))["userId"]
     return await delete_friend(user_id = user_id, request=request)
 
@@ -47,6 +50,9 @@ async def ban_users(request: FriendDto, authorization: Annotated[str, Header()])
 
 
 @friends_router.delete("/blocks")
-async def allow_users(request: FriendDto, authorization: Annotated[str, Header()]):
+async def allow_users(
+    request: Annotated[FriendDto, Depends()],
+    authorization: Annotated[str, Header()]
+):
     user_id = (await jwt_validator.verify_jwt_http(authorization))["userId"]
     return await unbanned_friends(user_id = user_id, request=request)

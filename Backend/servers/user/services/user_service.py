@@ -36,6 +36,9 @@ class UserService:
 
         user = await search_func(request.target_user_info)
 
+        if user is None:
+            return []
+
         if request.search_type != SearchType.Name:
             return [
                 ResponseUserInfoDTO(
