@@ -9,6 +9,7 @@ from typing import Annotated
 from dto.dto import LoginRequest, TokenResponse, SignupRequest, LoginResponse
 from services.auth_service import IssueJWTService
 from services.login_service import login, signup
+from commons.validate_jwt import JWTValidator
 
 router = APIRouter(
     prefix="/auth",
@@ -30,8 +31,13 @@ async def login_endpoint(request: LoginRequest):
     return LoginResponse(access_token=tokens[f"access_token_{request.user_id}"], refresh_token=tokens[f"refresh_token_{request.user_id}"])
 
 @router.delete("/tokens", status_code=status.HTTP_204_NO_CONTENT)
-async def logout_endpoint(user_id: str): 
-    pass
+async def logout_endpoint(user_id: str, authorization: Annotated[str | None, Header()] = None):
+    validator = JWTValidator()
+    payload = await validator.verify_jwt_http(authorization)
+    if payload.get("userId") != user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    auth_service = IssueJWTService()
+    await auth_service.delete_tokens(user_id)
 
 @router.put("/tokens", response_model=TokenResponse)
 async def refresh_token_endpoint(
@@ -59,5 +65,8 @@ async def signup_endpoint(request: SignupRequest):
     await signup(request)
 
 @router.delete("/users", status_code=status.HTTP_204_NO_CONTENT)
-async def withdraw_endpoint(user_id: str):
-    pass
+async def withdraw_endpoint(user_id: str, authorization: Annotated[str | None, Header()] = None):
+    validator = JWTValidator()
+    payload = await validator.verify_jwt_http(authorization)
+    if payload.get("userId") != user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
