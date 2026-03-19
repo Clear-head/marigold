@@ -5,7 +5,7 @@ from commons.validate_jwt import JWTValidator
 from services.friends_service import add_friend, get_friends, delete_friend, ban_friend, unbanned_friends, get_banned_friends
 from dto.friends_dto import FriendDto
 
-router = APIRouter(
+friends_router = APIRouter(
     prefix = "/user",
     tags = ["Friendship"],
 )

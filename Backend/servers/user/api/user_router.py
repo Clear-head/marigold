@@ -8,6 +8,7 @@ from services.user_service import UserService
 from dto.change_name_dto import RequestChangeName, ResponseChangeName
 from dto.change_phone_dto import RequestChangePhone, ResponseChangePhone
 from dto.change_birth_dto import RequestChangeBirth, ResponseChangeBirth
+from dto.read_user_dto import RequestUserInfoDTO, ResponseUserInfoDTO
 from commons.validate_jwt import JWTValidator
 
 router = APIRouter(
@@ -48,3 +49,11 @@ async def change_birth_endpoint(
 
     return await user_service.change_birth(birth_info=request, user_id=user_id)
 
+
+@router.get("/", response_model=list[ResponseUserInfoDTO])
+async def get_user_info(
+    authorization: Annotated[str, Header()],
+    request: Annotated[RequestUserInfoDTO, Depends()]
+):
+    await jwt_validator.verify_jwt_http(authorization)
+    return await user_service.get_user_info(request)

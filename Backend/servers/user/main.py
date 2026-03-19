@@ -8,8 +8,11 @@ from commons.logger import get_marigold_logger
 from commons.settings import settings
 from databases.mongo_client import init_database
 from kafka.topics import KafkaTopic
+
+from Backend.servers.auth.api import auth_router
 from models.user import User
 from api.user_router import router
+from api.friendship_router import friends_router
 from consumer.consumer import AuthConsumer
 
 logger = get_marigold_logger(__name__)
@@ -59,6 +62,7 @@ app.add_middleware(
 )
 
 app.include_router(router)
+app.include_router(friends_router)
 
 
 @app.get("/health", tags=["Health"])

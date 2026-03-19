@@ -11,6 +11,7 @@ from dto.change_phone_dto import RequestChangePhone, ResponseChangePhone
 from dto.change_birth_dto import RequestChangeBirth, ResponseChangeBirth
 from models.user import User
 from models.friendship import Friendship
+from dto.read_user_dto import SearchType, ResponseUserInfoDTO, RequestUserInfoDTO
 
 
 class UserService:
@@ -23,6 +24,36 @@ class UserService:
         self.logger = get_marigold_logger(__name__)
         self.repo = UserRepository()
         self.friend_repo = FriendsRepository()
+
+    async def get_user_info(self, request: RequestUserInfoDTO) -> list[ResponseUserInfoDTO]:
+        search_map = {
+            SearchType.Phone: self.repo.get_user_by_phone,
+            SearchType.ID: self.repo.get_user_by_id,
+            SearchType.Name: self.repo.get_user_by_name,
+        }
+
+        search_func = search_map.get(request.search_type)
+
+        user = await search_func(request.target_user_info)
+
+        if request.search_type != SearchType.Name:
+            return [
+                ResponseUserInfoDTO(
+                    target_user_id=str(user.id),
+                    name=user.name,
+                    phone=user.phone,
+                    birth=user.birth
+                )
+            ]
+        else:
+            return [
+                ResponseUserInfoDTO(
+                    target_user_id=str(u.id),
+                    name=u.name,
+                    phone=u.phone,
+                    birth=u.birth
+                ) for u in user
+            ]
     
     async def change_name(self, name_info: RequestChangeName, user_id: str):
         """
