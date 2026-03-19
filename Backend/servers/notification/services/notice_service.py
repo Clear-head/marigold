@@ -34,8 +34,14 @@ class NotificationService:
         except Exception as e:
             raise e
 
-    async def upsert_token(self, user_id: str):
+    async def upsert_token(self, user_id: str, device_id: str, fcm_token: str, platform: str):
         try:
-            await self.repository.upsert_token(user_id)
+            await self.repository.upsert_token(user_id, device_id, fcm_token, platform)
+        except Exception as e:
+            raise e
+
+    async def delete_token_by_device(self, user_id: str, device_id: str):
+        try:
+            await self.repository.delete_token_by_device(user_id, device_id)
         except Exception as e:
             raise e

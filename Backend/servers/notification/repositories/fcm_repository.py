@@ -48,3 +48,10 @@ class FCMRepository:
         except Exception as e:
             logger.error(f"Failed to delete FCM tokens for user {user_id}: {e}", exc_info=True)
             raise
+
+    async def delete_token_by_device(self, user_id: str, device_id: str) -> None:
+        try:
+            await FCM.find(FCM.user_id == user_id, FCM.device_id == device_id).delete()
+        except Exception as e:
+            logger.error(f"Failed to delete FCM token for user {user_id}, device {device_id}: {e}", exc_info=True)
+            raise

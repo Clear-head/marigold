@@ -18,7 +18,7 @@ class UserConsumer(BaseKafkaConsumer):
             if msg.value.get("type") == "DELETE_USER":
                 await self.service.delete_token(user_id=msg.value.get("user_id"))
             else:
-                await self.service.upsert_token(**msg.value)
+                self.logger.info(f"from auth event received: {msg.value.get('user_id')}")
 
         except Exception as e:
             self.logger.error(e)

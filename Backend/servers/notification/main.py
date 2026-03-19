@@ -8,9 +8,13 @@ from fastapi import FastAPI
 from firebase_admin import credentials
 from starlette.middleware.cors import CORSMiddleware
 
+from api.notification_router import router as notification_router
 from commons.logger import get_marigold_logger
 from commons.settings import settings
 from databases.mongo_client import init_database
+from databases.redis_client import close_redis_client
+from exceptions.notification_exceptions import NotificationException
+from handler.exception_handler import notification_exception_handler, general_exception_handler
 from kafka.topics import KafkaTopic
 from kafka_consumer.from_auth_consumer import UserConsumer
 from kafka_consumer.from_chat_consumer import ChatConsumer
@@ -56,6 +60,7 @@ async def lifespan(app: FastAPI):
             except asyncio.CancelledError:
                 pass
         firebase_admin.delete_app(firebase_admin.get_app())
+        await close_redis_client()
     except Exception as e:
         logger.error(f"Error during shutdown: {e}")
 
@@ -69,6 +74,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(notification_router)
+app.add_exception_handler(NotificationException, notification_exception_handler)
+app.add_exception_handler(Exception, general_exception_handler)
 
 
 @app.get("/health", tags=["Health"])
