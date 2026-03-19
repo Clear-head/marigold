@@ -9,26 +9,13 @@ import 'core/providers/core_providers.dart';
 import 'features/auth/presentation/screens/login_screen.dart';
 import 'features/shell/presentation/screens/main_shell_screen.dart';
 
-// 알림 권한 및 토큰 설정을 위한 함수
+// 알림 권한 요청 (토큰 등록은 로그인 후 LoginNotifier에서 처리)
 Future<void> setupFCM() async {
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-  // 1. 알림 권한 요청 (iOS 및 Android 13 이상 대응)
-  NotificationSettings settings = await messaging.requestPermission(
+  await FirebaseMessaging.instance.requestPermission(
     alert: true,
     badge: true,
     sound: true,
   );
-
-  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    print('유저가 알림 권한을 허용했습니다.');
-
-    // 2. 고유 토큰 가져오기 (이 토큰을 나중에 FastAPI로 보내야 함)
-    String? token = await messaging.getToken();
-    print("🚀 FCM Token: $token");
-  } else {
-    print('유저가 알림 권한을 거부했습니다.');
-  }
 }
 
 void main() async { // async 추가

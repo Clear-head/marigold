@@ -1,5 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logger/logger.dart';
+import 'package:uuid/uuid.dart';
 
 /// JWT 토큰을 안전하게 저장하고 관리하는 클래스
 class TokenStorage {
@@ -9,6 +10,7 @@ class TokenStorage {
   static const String _accessTokenKey = 'access_token';
   static const String _refreshTokenKey = 'refresh_token';
   static const String _userIdKey = 'user_id';
+  static const String _deviceIdKey = 'device_id';
 
   TokenStorage({
     FlutterSecureStorage? storage,
@@ -75,6 +77,31 @@ class TokenStorage {
       return await _storage.read(key: _userIdKey);
     } catch (e) {
       _logger.e('Failed to get user ID: $e');
+      return null;
+    }
+  }
+
+  /// Device ID 가져오기 (없으면 생성 후 저장)
+  Future<String> getOrCreateDeviceId() async {
+    try {
+      final existing = await _storage.read(key: _deviceIdKey);
+      if (existing != null && existing.isNotEmpty) return existing;
+      final newId = const Uuid().v4();
+      await _storage.write(key: _deviceIdKey, value: newId);
+      _logger.d('Device ID created: $newId');
+      return newId;
+    } catch (e) {
+      _logger.e('Failed to get or create device ID: $e');
+      rethrow;
+    }
+  }
+
+  /// Device ID 가져오기
+  Future<String?> getDeviceId() async {
+    try {
+      return await _storage.read(key: _deviceIdKey);
+    } catch (e) {
+      _logger.e('Failed to get device ID: $e');
       return null;
     }
   }

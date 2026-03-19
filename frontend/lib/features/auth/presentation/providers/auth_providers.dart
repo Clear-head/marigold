@@ -1,6 +1,10 @@
+import 'dart:io';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/providers/core_providers.dart';
+import '../../../notification/data/datasources/notification_remote_datasource.dart';
 import '../../data/datasources/auth_remote_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -37,6 +41,26 @@ class LoginNotifier extends AsyncNotifier<void> {
         await tokenStorage.saveRefreshToken(tokens['refresh_token']!);
         await tokenStorage.saveUserId(userId);
         state = const AsyncData(null);
+
+        // FCM 토큰 등록 (실패해도 로그인 성공 처리)
+        try {
+          final fcmToken = await FirebaseMessaging.instance.getToken();
+          if (fcmToken != null) {
+            final deviceId = await tokenStorage.getOrCreateDeviceId();
+            final platform = Platform.isAndroid ? 'android' : 'ios';
+            final notificationDs = NotificationRemoteDataSourceImpl(
+              dioClient: ref.read(notificationDioClientProvider),
+            );
+            await notificationDs.registerToken(
+              deviceId: deviceId,
+              fcmToken: fcmToken,
+              platform: platform,
+            );
+          }
+        } catch (e) {
+          // FCM 등록 실패는 로그인 플로우를 막지 않음
+        }
+
         return true;
       },
     );
@@ -91,5 +115,17 @@ final logoutProvider = FutureProvider.autoDispose<void>((ref) async {
     final repository = ref.read(authRepositoryProvider);
     await repository.logout(userId: userId);
   }
+
+  // FCM 토큰 삭제 (실패해도 로그아웃 진행)
+  try {
+    final deviceId = await tokenStorage.getDeviceId();
+    if (deviceId != null) {
+      final notificationDs = NotificationRemoteDataSourceImpl(
+        dioClient: ref.read(notificationDioClientProvider),
+      );
+      await notificationDs.deleteToken(deviceId: deviceId);
+    }
+  } catch (_) {}
+
   await tokenStorage.clearAll();
 });
